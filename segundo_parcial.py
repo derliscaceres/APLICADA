@@ -123,7 +123,7 @@ recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
 
 
 # Iteramos sobre los productos para calcular recomendaciones
-x=1000
+x=500
 #x = len(productos_data)
 recomendados = set()
 puntaje = {}
