@@ -72,20 +72,25 @@ def calcular_recomendacion(rating_value, similarity_value):
     # Define the rules
     rule1 = ctrl.Rule(rating['Excellent'] & similarity['Excellent'], recommendation['Highly Recommended'])
     rule2 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Highly Recommended'])
-    rule3 = ctrl.Rule(rating['Good'] & similarity['Good'], recommendation['Highly Recommended'])
-    rule4 = ctrl.Rule(rating['Average'] & similarity['Excellent'], recommendation['Highly Recommended'])
-    rule5 = ctrl.Rule(rating['Average'] & similarity['Good'], recommendation['Recommended'])
-    rule6 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Recommended'])
-    rule7 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Recommended'])
-    rule8 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Likely to Recommend'])
-    rule9 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Recommended'])
-    rule10 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Not Recommend'])
-    rule11 = ctrl.Rule(rating['Poor'] & similarity['Average'], recommendation['Not recommend'])
-    rule12 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Recommended'])
+    rule3 = ctrl.Rule(rating['Excellent'] & similarity['Average'], recommendation['Recommended'])
+    rule4 = ctrl.Rule(rating['Excellent'] & similarity['Poor'], recommendation['Recommended'])
+    rule5 = ctrl.Rule(rating['Good'] & similarity['Excellent'], recommendation['Highly Recommended'])
+    rule6 = ctrl.Rule(rating['Good'] & similarity['Good'], recommendation['Highly Recommended'])
+    rule7 = ctrl.Rule(rating['Good'] & similarity['Average'], recommendation['Recommended'])
+    rule8 = ctrl.Rule(rating['Good'] & similarity['Poor'], recommendation['Likely to recommend'])
+    rule9 = ctrl.Rule(rating['Average'] & similarity['Excellent'], recommendation['Highly Recommended'])
+    rule10 = ctrl.Rule(rating['Average'] & similarity['Good'], recommendation['Recommended'])
+    rule11 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Recommended'])
+    rule12 = ctrl.Rule(rating['Average'] & similarity['Poor'], recommendation['Not recommend'])
+    rule13 = ctrl.Rule(rating['Poor'] & similarity['Excellent'], recommendation['Likely to recommend'])
+    rule14 = ctrl.Rule(rating['Poor'] & similarity['Good'], recommendation['Not recommend'])
+    rule15 = ctrl.Rule(rating['Poor'] & similarity['Average'], recommendation['Not recommend'])
+    rule16 = ctrl.Rule(rating['Poor'] & similarity['Poor'], recommendation['Not recommend'])
+    
 
 
     # Create the control system and define the simulation
-    recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12])
+    recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12, rule13, rule14, rule15, rule16])
     recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
 
     # Set input values
