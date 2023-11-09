@@ -41,7 +41,7 @@ df['sentiment_score'] = df['reviewText'].apply(get_sentiment_score)
 for review in df['sentiment_score'][:1000]:
     print(review)
 
-
+ 
 end = time.time()
 print(end)
 print(end - start)
