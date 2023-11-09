@@ -4,14 +4,11 @@ import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import time
 
-# Función para parsear un archivo JSON línea por línea
 def parse(path):
     with open(path, 'rb') as file:
         for line in file:
             yield json.loads(line)
 
-
-# Obtiene productos únicos basados en el identificador 'asin'
 def get_unique_asin_products(path):
     products = {}
     for data in parse(path):
@@ -20,14 +17,12 @@ def get_unique_asin_products(path):
             products[asin] = data
     return list(products.values())
 
-# Obtiene todas las reseñas del archivo
 def get_reviews(path):
     reviews = []
     for data in parse(path):
         reviews.append(data)
     return reviews
 
-# Función que calcula la similitud entre dos productos
 def similitud(p1, p2):
     sp1, sp2 = set(), set()
     for item in p1['also_view']:
@@ -47,7 +42,8 @@ def similitud(p1, p2):
         x = len(sp1.intersection(sp2)) / len(sp1.union(sp2))
     else:
         x = 0
-    return x*10
+    x=x*10.0
+    return x
 
 # Cargamos las estructuras
 productos_data = get_unique_asin_products('meta_Software.json')
@@ -68,16 +64,14 @@ for producto in productos_data:
         producto['score'] = orevall_scores[asin][0] / orevall_scores[asin][1]
     else:
         producto['score'] = 0.0
-
-
-# Definimos los antecedentes de la logica difusa
+# Logica difusa
 rating = ctrl.Antecedent(np.arange(0, 6, 1), 'rating')
 similarity = ctrl.Antecedent(np.arange(0, 11, 1), 'similarity')
 
-# Definimos el output o consecuente de la logica difusa
+# Define the output variable
 recommendation = ctrl.Consequent(np.arange(0, 11, 1), 'recommendation')
 
-# Definimos las funciones de membresía para cada variable
+# Define the membership functions for each variable
 rating['Poor'] = fuzz.trimf(rating.universe, [0, 0, 2.5])
 rating['Average'] = fuzz.trimf(rating.universe, [2.3, 3, 3])
 rating['Good'] = fuzz.trimf(rating.universe, [2.8, 4, 4])
@@ -93,7 +87,7 @@ recommendation['Likely to recommend'] = fuzz.trimf(recommendation.universe, [2.5
 recommendation['Recommended'] = fuzz.trimf(recommendation.universe, [5, 8, 8])
 recommendation['Highly Recommended'] = fuzz.trimf(recommendation.universe, [7, 10, 10])
 
-# Definimos las reglas difusas
+# Define the rules
 rule1 = ctrl.Rule(rating['Excellent'] & similarity['Excellent'], recommendation['Highly Recommended'])
 rule2 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Highly Recommended'])
 rule3 = ctrl.Rule(rating['Excellent'] & similarity['Average'], recommendation['Recommended'])
@@ -111,13 +105,11 @@ rule14 = ctrl.Rule(rating['Poor'] & similarity['Good'], recommendation['Not reco
 rule15 = ctrl.Rule(rating['Poor'] & similarity['Average'], recommendation['Not recommend'])
 rule16 = ctrl.Rule(rating['Poor'] & similarity['Poor'], recommendation['Not recommend'])
 
-# Creamos el sistema de control y simulación
+# Create the control system and define the simulation
 recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12, rule13, rule14, rule15, rule16])
 recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
 
-
-# Iteramos sobre los productos para calcular recomendaciones
-x=500
+x=1000
 #x = len(productos_data)
 recomendados = set()
 puntaje = {}
@@ -136,8 +128,16 @@ for producto in productos_data[:x]:
 recomendados = list(recomendados)
 recomendados = sorted(recomendados, key=lambda x: puntaje[x], reverse=True)
 
-
-# Imprimimos los productos recomendados y sus puntajes
+# Impresión de resultados
+print("-----------------------------------------------------")
+print("Recommended:")
+print("-----------------------------------------------------")
 for item in recomendados:
-    print(item, " Puntaje:", puntaje[item])
-print("Productos recomendados:", len(recomendados))
+    if puntaje[item] <= 8 and puntaje[item] >= 5.0:
+        print(item, " Puntaje:", puntaje[item], end=" || ")
+print("-----------------------------------------------------")
+print("Highly Recommended:")
+print("-----------------------------------------------------")
+for item in recomendados:
+    if puntaje[item] >= 7.0:
+        print(item, " Puntaje:", puntaje[item], end=" || ")
