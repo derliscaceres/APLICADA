@@ -22,6 +22,7 @@ que son necesarias para el funcionamiento correcto del programa
  - scikit-fuzzy
  - matplotlib
  - nltk
+ - numpy
 
 Para ejecutar el proyecto asegurece de colocar los dos datesets en la carpeta donde se encuentra el archivo segundo_parcial.py y ejecutar el codigo
 " py .\segundo_parcial.py "
