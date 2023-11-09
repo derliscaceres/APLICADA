@@ -17,6 +17,10 @@ def getDF(path):
     i += 1
   return pd.DataFrame.from_dict(df, orient='index')
 
+df = getDF('Software.json')
+dfmeta = getDF('meta_Software.json')
+print(dfmeta.columns)
+
 def get_sentiment_score(text):
     if not pd.isna(text):  # Comprueba si el valor no es nulo
         sentiment = sia.polarity_scores(text)

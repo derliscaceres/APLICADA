@@ -18,61 +18,66 @@ def getDF(path):
         i += 1
     return pd.DataFrame.from_dict(df, orient='index')
 
-df = getDF('Software.json')
-# Define the input variables
-rating = ctrl.Antecedent(np.arange(0, 6, 1), 'rating')
-popularity = ctrl.Antecedent(np.arange(0, 11, 1), 'popularity')
+#df = getDF('Software.json')
+def calcular_recomendacion(rating_value, similarity_value):
+    # Define the input variables
+    rating = ctrl.Antecedent(np.arange(0, 6, 1), 'rating')
+    similarity = ctrl.Antecedent(np.arange(0, 11, 1), 'similarity')
 
-# Define the output variable
-recommendation = ctrl.Consequent(np.arange(0, 11, 1), 'recommendation')
+    # Define the output variable
+    recommendation = ctrl.Consequent(np.arange(0, 11, 1), 'recommendation')
 
-# Define the membership functions for each variable
-rating['Poor'] = fuzz.trimf(rating.universe, [0, 0, 2.5])
-rating['Average'] = fuzz.trimf(rating.universe, [2.3, 3, 3.8])
-rating['Good'] = fuzz.trimf(rating.universe, [2.8, 4, 4])
-rating['Excellent'] = fuzz.trimf(rating.universe, [3.8, 5, 5])
-rating.view()
-input("Presionar enter para continuar")
+    # Define the membership functions for each variable
+    rating['Poor'] = fuzz.trimf(rating.universe, [0, 0, 2.5])
+    rating['Average'] = fuzz.trimf(rating.universe, [2.3, 3, 3])
+    rating['Good'] = fuzz.trimf(rating.universe, [2.8, 4, 4])
+    rating['Excellent'] = fuzz.trimf(rating.universe, [3.8, 5, 5])
+    #rating.view()
 
-popularity['Poor'] = fuzz.trimf(popularity.universe, [0, 0, 3])
-popularity['Average'] = fuzz.trimf(popularity.universe, [2.5, 5.5, 5.5])
-popularity['Good'] = fuzz.trimf(popularity.universe, [5, 8, 8])
-popularity['Excellent'] = fuzz.trimf(popularity.universe, [7, 10, 10])
-popularity.view()
-input("Presionar enter para continuar")
-
-recommendation['Not recommend'] = fuzz.trimf(recommendation.universe, [0, 0, 3])
-recommendation['Likely to recommend'] = fuzz.trimf(recommendation.universe, [2.5, 5.5, 5.5])
-recommendation['Recommended'] = fuzz.trimf(recommendation.universe, [5, 8, 8])
-recommendation['Highly Recommended'] = fuzz.trimf(recommendation.universe, [7, 10, 10])
-recommendation.view()
-input("Presionar enter para continuar")
-
-# Define the rules
-rule1 = ctrl.Rule(rating['Excellent'] & popularity['Excellent'], recommendation['Highly Recommended'])
-rule2 = ctrl.Rule(rating['Excellent'] & popularity['Good'], recommendation['Highly Recommended'])
-rule3 = ctrl.Rule(rating['Good'] & popularity['Good'], recommendation['Highly Recommended'])
-rule4 = ctrl.Rule(rating['Average'] & popularity['Excellent'], recommendation['Highly Recommended'])
-rule5 = ctrl.Rule(rating['Average'] & popularity['Good'], recommendation['Recommended'])
-rule6 = ctrl.Rule(rating['Average'] & popularity['Average'], recommendation['Recommended'])
-rule7 = ctrl.Rule(rating['Excellent'] & popularity['Good'], recommendation['Recommended'])
-rule8 = ctrl.Rule(rating['Average'] & popularity['Average'], recommendation['Likely to recommend'])
-rule9 = ctrl.Rule(rating['Average'] & popularity['Average'], recommendation['Recommended'])
-rule10 = ctrl.Rule(rating['Average'] & popularity['Average'], recommendation['Not recommend'])
-rule11 = ctrl.Rule(rating['Poor'] & popularity['Average'], recommendation['Not recommend'])
-rule12 = ctrl.Rule(rating['Excellent'] & popularity['Good'], recommendation['Recommended'])
+    similarity['Poor'] = fuzz.trimf(similarity.universe, [0, 0, 3])
+    similarity['Average'] = fuzz.trimf(similarity.universe, [2.5, 5.5, 5.5])
+    similarity['Good'] = fuzz.trimf(similarity.universe, [5, 8, 8])
+    similarity['Excellent'] = fuzz.trimf(similarity.universe, [7, 10, 10])
+    #similarity.view()
 
 
-# Create the control system and define the simulation
-recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9])
-recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
+    recommendation['Not recommend'] = fuzz.trimf(recommendation.universe, [0, 0, 3])
+    recommendation['Likely to recommend'] = fuzz.trimf(recommendation.universe, [2.5, 5.5, 5.5])
+    recommendation['Recommended'] = fuzz.trimf(recommendation.universe, [5, 8, 8])
+    recommendation['Highly Recommended'] = fuzz.trimf(recommendation.universe, [7, 10, 10])
+    #recommendation.view()
 
-# Set input values
-recommendation_sim.input['rating'] = 7
-recommendation_sim.input['popularity'] = 9
+    # Define the rules
+    rule1 = ctrl.Rule(rating['Excellent'] & similarity['Excellent'], recommendation['Highly Recommended'])
+    rule2 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Highly Recommended'])
+    rule3 = ctrl.Rule(rating['Good'] & similarity['Good'], recommendation['Highly Recommended'])
+    rule4 = ctrl.Rule(rating['Average'] & similarity['Excellent'], recommendation['Highly Recommended'])
+    rule5 = ctrl.Rule(rating['Average'] & similarity['Good'], recommendation['Recommended'])
+    rule6 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Recommended'])
+    rule7 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Recommended'])
+    rule8 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Likely to recommend'])
+    rule9 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Recommended'])
+    rule10 = ctrl.Rule(rating['Average'] & similarity['Average'], recommendation['Not recommend'])
+    rule11 = ctrl.Rule(rating['Poor'] & similarity['Average'], recommendation['Not recommend'])
+    rule12 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Recommended'])
 
-# Compute the recommendation
-recommendation_sim.compute()
 
-# Print the recommendation
-print("Recommendation:", recommendation_sim.output['recommendation'])
+    # Create the control system and define the simulation
+    recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12])
+    recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
+
+    # Set input values
+    recommendation_sim.input['rating'] = rating_value
+    recommendation_sim.input['similarity'] = similarity_value
+
+    # Compute the recommendation
+    recommendation_sim.compute()
+
+    return recommendation_sim.output['recommendation']
+
+'''
+rating_input = 2.5
+similarity_input = 8
+recomendacion = calcular_recomendacion(rating_input, similarity_input)
+print("Recommendation:",recomendacion) 
+'''
