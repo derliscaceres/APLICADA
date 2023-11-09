@@ -80,9 +80,8 @@ def calcular_recomendacion(rating_value, similarity_value):
 
     return recommendation_sim.output['recommendation']
 
-'''
-rating_input = 1
-similarity_input = 1
+
+rating_input = 4
+similarity_input = 0
 recomendacion = calcular_recomendacion(rating_input, similarity_input)
 print("Recommendation:",recomendacion) 
-'''
