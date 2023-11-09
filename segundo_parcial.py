@@ -52,6 +52,8 @@ def similitud(p1, p2):
     x=x*10.0
     return x
 
+start = time.time()
+
 # Cargamos las estructuras
 productos_data = get_unique_asin_products('meta_Software.json')
 reviews_data = get_reviews('Software.json')
@@ -71,6 +73,7 @@ for producto in productos_data:
         producto['score'] = orevall_scores[asin][0] / orevall_scores[asin][1]
     else:
         producto['score'] = 0.0
+
 # Logica difusa
 # Definimos los antecedentes o inputs.
 rating = ctrl.Antecedent(np.arange(0, 6, 1), 'rating')
@@ -95,7 +98,8 @@ recommendation['Likely to recommend'] = fuzz.trimf(recommendation.universe, [2.5
 recommendation['Recommended'] = fuzz.trimf(recommendation.universe, [5, 8, 8])
 recommendation['Highly Recommended'] = fuzz.trimf(recommendation.universe, [7, 10, 10])
 
-# Definimos las reglas difusas
+
+# Definimos las reglas de inferencia
 rule1 = ctrl.Rule(rating['Excellent'] & similarity['Excellent'], recommendation['Highly Recommended'])
 rule2 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Highly Recommended'])
 rule3 = ctrl.Rule(rating['Excellent'] & similarity['Average'], recommendation['Recommended'])
@@ -113,7 +117,7 @@ rule14 = ctrl.Rule(rating['Poor'] & similarity['Good'], recommendation['Not reco
 rule15 = ctrl.Rule(rating['Poor'] & similarity['Average'], recommendation['Not recommend'])
 rule16 = ctrl.Rule(rating['Poor'] & similarity['Poor'], recommendation['Not recommend'])
 
-# Creamos el sistema de control y simulación
+# Cargamos las reglas al sistema de control y definimos la variable de simulación
 recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12, rule13, rule14, rule15, rule16])
 recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
 
@@ -151,3 +155,6 @@ print("-----------------------------------------------------")
 for item in recomendados:
     if puntaje[item] >= 7.0:
         print(item, " Puntaje:", puntaje[item], end=" || ")
+
+end = time.time()
+print("Tiempo de ejecución:",(end - start))
