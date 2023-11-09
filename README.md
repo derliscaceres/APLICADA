@@ -1,6 +1,6 @@
-#Bienvenidos al proyecto de Matematica Aplicada
+# Bienvenidos al proyecto de Matematica Aplicada
 
-##Integrantes
+## Integrantes
 
  - Osmani Jose Mestre Riveros
  - Derlis Ariel Cáceres Núñez
