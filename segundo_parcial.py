@@ -4,11 +4,15 @@ import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import time
 
+
+# Función para parsear un archivo JSON línea por línea
 def parse(path):
     with open(path, 'rb') as file:
         for line in file:
             yield json.loads(line)
 
+
+# Obtiene productos únicos basados en el identificador 'asin'
 def get_unique_asin_products(path):
     products = {}
     for data in parse(path):
@@ -17,12 +21,15 @@ def get_unique_asin_products(path):
             products[asin] = data
     return list(products.values())
 
+
+# Obtiene todas las reseñas del archivo
 def get_reviews(path):
     reviews = []
     for data in parse(path):
         reviews.append(data)
     return reviews
 
+# Función que calcula la similitud entre dos productos
 def similitud(p1, p2):
     sp1, sp2 = set(), set()
     for item in p1['also_view']:
@@ -65,13 +72,14 @@ for producto in productos_data:
     else:
         producto['score'] = 0.0
 # Logica difusa
+# Definimos los antecedentes o inputs.
 rating = ctrl.Antecedent(np.arange(0, 6, 1), 'rating')
 similarity = ctrl.Antecedent(np.arange(0, 11, 1), 'similarity')
 
-# Define the output variable
+# Definimos el output o el consecuente
 recommendation = ctrl.Consequent(np.arange(0, 11, 1), 'recommendation')
 
-# Define the membership functions for each variable
+# Definimos las funciones de membresía para cada variable
 rating['Poor'] = fuzz.trimf(rating.universe, [0, 0, 2.5])
 rating['Average'] = fuzz.trimf(rating.universe, [2.3, 3, 3])
 rating['Good'] = fuzz.trimf(rating.universe, [2.8, 4, 4])
@@ -87,7 +95,7 @@ recommendation['Likely to recommend'] = fuzz.trimf(recommendation.universe, [2.5
 recommendation['Recommended'] = fuzz.trimf(recommendation.universe, [5, 8, 8])
 recommendation['Highly Recommended'] = fuzz.trimf(recommendation.universe, [7, 10, 10])
 
-# Define the rules
+# Definimos las reglas difusas
 rule1 = ctrl.Rule(rating['Excellent'] & similarity['Excellent'], recommendation['Highly Recommended'])
 rule2 = ctrl.Rule(rating['Excellent'] & similarity['Good'], recommendation['Highly Recommended'])
 rule3 = ctrl.Rule(rating['Excellent'] & similarity['Average'], recommendation['Recommended'])
@@ -105,10 +113,12 @@ rule14 = ctrl.Rule(rating['Poor'] & similarity['Good'], recommendation['Not reco
 rule15 = ctrl.Rule(rating['Poor'] & similarity['Average'], recommendation['Not recommend'])
 rule16 = ctrl.Rule(rating['Poor'] & similarity['Poor'], recommendation['Not recommend'])
 
-# Create the control system and define the simulation
+# Creamos el sistema de control y simulación
 recommendation_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9, rule10, rule11, rule12, rule13, rule14, rule15, rule16])
 recommendation_sim = ctrl.ControlSystemSimulation(recommendation_ctrl)
 
+
+# Iteramos sobre los productos para calcular recomendaciones
 x=1000
 #x = len(productos_data)
 recomendados = set()
