@@ -129,3 +129,4 @@ recomendados = sorted(recomendados, key=lambda x: puntaje[x], reverse=True)
 
 for item in recomendados:
     print(item, " Puntaje:", puntaje[item])
+print("Productos recomendados:", len(recomendados))
