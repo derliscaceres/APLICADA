@@ -2,3 +2,4 @@ pandas
 scikit-fuzzy
 matplotlib
 nltk
+numpy
