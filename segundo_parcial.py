@@ -87,17 +87,22 @@ rating['Poor'] = fuzz.trimf(rating.universe, [0, 0, 2.5])
 rating['Average'] = fuzz.trimf(rating.universe, [2.3, 3, 3])
 rating['Good'] = fuzz.trimf(rating.universe, [2.8, 4, 4])
 rating['Excellent'] = fuzz.trimf(rating.universe, [3.8, 5, 5])
+#rating.view()
+#input()
 
 similarity['Poor'] = fuzz.trimf(similarity.universe, [0, 0, 3])
 similarity['Average'] = fuzz.trimf(similarity.universe, [2.5, 5.5, 5.5])
 similarity['Good'] = fuzz.trimf(similarity.universe, [5, 8, 8])
 similarity['Excellent'] = fuzz.trimf(similarity.universe, [7, 10, 10])
+#similarity.view()
+#input()
 
 recommendation['Not recommend'] = fuzz.trimf(recommendation.universe, [0, 0, 3])
 recommendation['Likely to recommend'] = fuzz.trimf(recommendation.universe, [2.5, 5.5, 5.5])
 recommendation['Recommended'] = fuzz.trimf(recommendation.universe, [5, 8, 8])
 recommendation['Highly Recommended'] = fuzz.trimf(recommendation.universe, [7, 10, 10])
-
+#recommendation.view()
+#input()
 
 # Definimos las reglas de inferencia
 rule1 = ctrl.Rule(rating['Excellent'] & similarity['Excellent'], recommendation['Highly Recommended'])
@@ -135,9 +140,17 @@ for producto in productos_data[:x]:
             recommendation_sim.compute()
 
             k = recommendation_sim.output['recommendation']
-            #if k > 7.0 and producto['asin'] not in recomendados:
-            recomendados.add(producto['asin'])
-            puntaje[producto['asin']] = k
+            
+            if puntaje.get(producto['asin']):
+                puntaje[producto['asin']] += k
+            else:
+                puntaje[producto['asin']] = k
+
+            if producto['asin'] not in recomendados:
+                recomendados.add(producto['asin'])
+
+    if puntaje.get(producto['asin']):
+        puntaje[producto['asin']] = puntaje[producto['asin']] / (x-1)
 
 recomendados = list(recomendados)
 recomendados = sorted(recomendados, key=lambda x: puntaje[x], reverse=True)
@@ -148,13 +161,13 @@ print("Recommended:")
 print("-----------------------------------------------------")
 for item in recomendados:
     if puntaje[item] <= 8 and puntaje[item] >= 5.0:
-        print(item, " Puntaje:", puntaje[item], end=" || ")
+        print(item, " Puntaje:", puntaje[item])
 print("-----------------------------------------------------")
 print("Highly Recommended:")
 print("-----------------------------------------------------")
 for item in recomendados:
     if puntaje[item] >= 7.0:
-        print(item, " Puntaje:", puntaje[item], end=" || ")
+        print(item, " Puntaje:", puntaje[item])
 
 end = time.time()
 print("Tiempo de ejecución:",(end - start))
